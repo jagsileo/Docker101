@@ -1,0 +1,112 @@
+Why Docker?
+
+Enables running an app in a loosely isolated environment called Containers.
+No need for hypervisor, containers are lightweight, run on host machine's kernel
+Provides tooling and platform to manage lifecycle of containers
+
+VM- Runs a full blown guest operating system with virtual access to host resources through hypervisors.
+    In general, VM provides an env with more resources than most applications need
+
+Docker Engine:
+
+Client server app   - managers container, images, data volumes, network
+    Server: Long running program called a daemon process (docker d command)
+    REST API: Interface programs can use to talk to the daemon and instruct it what to docker
+    CLI: docker command
+
+
+
+Docker client talk to docker daemon (can be on the same system or can be remote)
+They talk using REST API or UNIX sockets or network Interface
+Docker client can communicate with more than one daemon
+
+Docker Objects:
+
+IMAGES:
+    Read only template with instructions for creating a docker container
+    An image is usually based on another image
+    Dockerfile - syntax for defining steps needed to create the image and run it
+    Each instruction in dockerfile creates a layer on the image
+    Changing the docker image and rebuilding it will only rebuild those layers that have changed - no the entire image
+
+
+CONTAINERS:
+    Runnable instance of an image - what image becomes in memory when executed, image with state or a user process
+    Create, stop, start, move, delete a container using CLI
+    Container - well isolated from host machine and other containers
+              - Can be defined as to how isolated a container's network, storage and its underlying subsystems need to be
+
+    Removing a containers makes all its state not stored in a persistent storage to disappear
+    Runs natively on Linux
+
+
+SERVICES:
+    Allows to scale containers across multiple Docker daemons.
+    In a production (distributed app), each piece is called a service
+    Service runs only one image, codifies the way that image runs
+    Swarm with multiple managers and workers
+    All daemons communicate with each other using Docker API
+    Allows to define the desired state - for example, number of replicas of the service that should be available at any given time
+    Services are load balanced across all workers
+
+TASK:
+    A single container running in a service
+    Have unique ID that increment to the number of replicas defined
+
+    basically each replica can be called a task. if run localhost:4000 back to back, each time container ID changes indicating load balancing
+
+Underlying Technology:
+
+Namespaces:
+    Uses Namespaces to provide isolated workspace called the container
+    Each aspect of a container runs in a separate namespace, access is limited to that namespace
+
+
+  pid: Process isolation (Process ID)
+  net: Network interfaces
+  ipc: access to Interprocess communication
+  mnt: Filesystem mount points
+  uts: Isolaye kernel and version identifiers (UTS: Unix Timesharing system)
+
+
+Control groups:
+    Controls the amount of resources available to a container
+    Allow sharing available hardware resources
+    enforces limits and constraints. Eg., limit the memory available
+
+Union Filesystems:
+    File systems that operate by creating layers
+
+Container format:
+    Docker engine combines namespace, control groups and unionFS into a wrapper called Container 
+    Default container format is called libcontainer
+
+
+
+DOCKER COMMANDS:
+
+docker build => builds an image from the dockerfile
+    --tag, -t => Name the docker image using tag flag
+
+built image is in local image registry
+
+docker run => run the built image
+    -p => host_port:container_port
+        This means if container is running at port 80 (container_port), we access it from our local browser at localhost:host_port    
+
+    -d => Run the app in the background
+
+docker container stop <container_id> => stops a running container
+
+docker tag image username/repository:tag => Tags the local image name with a repository in the registry , notation is username/repository:tag
+
+docker push username/repository:tag => Pushes the tagged image to the repository in registry
+
+
+docker-compose.yml => YAML file specifies how a docker container should behave in production - what port is should use, how many replicas of the container should run
+
+
+
+
+
+Then there is swarm and stack which are at the top of hierarchy, kubernetes sort of replace them at carfax, so out of scope for now
